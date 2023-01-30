@@ -10,7 +10,9 @@ import {
 
 const Billings = () => {
   const [state, dispatch] = useContext(Context);
-  const { allBill, isLoading, page } = state;
+  const { allBill, isLoading } = state;
+  const [page, setPage] = useState(1);
+  console.log(page);
 
   const limit = 10;
 
@@ -28,7 +30,7 @@ const Billings = () => {
           });
         }
       });
-  }, []);
+  }, [page]);
 
   const handleDelete = (id) => {
     axios
@@ -39,6 +41,18 @@ const Billings = () => {
           alert("Delete success");
         }
       });
+  };
+
+  const handlePrevious = () => {
+    if (page === 1) {
+      setPage(1);
+    } else {
+      setPage(page - 1);
+    }
+  };
+
+  const handleNext = () => {
+    setPage((p) => p + 1);
   };
 
   return (
@@ -80,7 +94,10 @@ const Billings = () => {
           </tbody>
         </table>
       </div>
-      <butto onClick={() => dispatch({ type: ADD_PAGE })}>Next</butto>
+      <div className=" d-flex justify-content-center text-center">
+        <button onClick={handlePrevious}>Previous</button>
+        <button onClick={handleNext}>Next</button>
+      </div>
     </div>
   );
 };

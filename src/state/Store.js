@@ -4,7 +4,6 @@ import Reducer from "./Reducer";
 const initialState = {
   allBill: [],
   isLoading: false,
-  page: 1,
 };
 
 const Store = ({ children }) => {

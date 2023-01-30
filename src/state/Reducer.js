@@ -30,12 +30,6 @@ const Reducer = (state, action) => {
         };
       }
 
-    case ADD_PAGE:
-      return {
-        ...state,
-        page: state.page + 1,
-      };
-
     case GET_BILLING:
       return {
         ...state,
