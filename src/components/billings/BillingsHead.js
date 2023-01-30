@@ -1,30 +1,89 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button } from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 
 import Modal from "react-bootstrap/Modal";
+import { useForm } from "react-hook-form";
+import axios from "axios";
+import { Context } from "../../state/Store";
+import { ADD_BILLING } from "../../state/ActionTypes";
 
 const BillingsHead = () => {
   const [show, setShow] = useState(false);
+  const [state, dispatch] = useContext(Context);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const { register, handleSubmit, reset } = useForm();
+  const onSubmit = (data) => {
+    axios
+      .post("http://localhost:5000/api/add-billing", { data })
+      .then((res) => {
+        if (res.data.data.acknowledged) {
+          reset();
+          handleClose();
+
+          dispatch({
+            type: ADD_BILLING,
+            payload: {
+              name: data.name,
+              email: data.email,
+              phone: data.email,
+              amount: data.amount,
+              _id: res.data.data.insertedIds[0],
+            },
+          });
+        }
+      });
+  };
+
   return (
     <div>
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+          <Modal.Title>Create A New Bill</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
+        <Modal.Body className="mx-auto">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <input
+              className="mt-2"
+              {...register("name")}
+              type="text"
+              placeholder="  Full Name"
+              required
+              maxLength="15"
+            />
+            <br />
+            <input
+              className="mt-2"
+              {...register("email")}
+              type="email"
+              placeholder="E-mail"
+              required
+            />
+            <br />
+            <input
+              className="mt-2"
+              {...register("phone")}
+              type="number"
+              placeholder="Phone"
+              required
+              maxLength="15"
+            />
+            <br />
+            <input
+              className="mt-2"
+              {...register("amount")}
+              type="number"
+              placeholder="Amount"
+              maxLength="8"
+              required
+            />
+            <br />
+            <input className="mt-2" type="submit" value="Create Post" />
+          </form>
+        </Modal.Body>
       </Modal>
 
       <Navbar>
