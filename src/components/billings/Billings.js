@@ -171,7 +171,10 @@ const Billings = () => {
                 ?.filter((item) => {
                   return search.toLowerCase() === ""
                     ? item
-                    : item.name.toLowerCase().includes(search);
+                    : item.name?.toLowerCase().includes(search) ||
+                        item.phone?.includes(search) ||
+                        item.email.toLowerCase().includes(search) ||
+                        item.amount.includes(search);
                 })
                 .map((bill, index) => (
                   <tr key={index}>

@@ -102,7 +102,7 @@ const BillingsHead = () => {
             type="text"
             className="form-control"
             id="pwd"
-            placeholder="Search by name"
+            placeholder="Search by any"
             name="search"
             onChange={(e) =>
               dispatch({ type: FILTER_SEARCH, payload: e.target.value })
