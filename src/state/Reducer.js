@@ -1,17 +1,16 @@
 import {
   ADD_BILLING,
   ADD_PAGE,
+  FILTER_SEARCH,
   GET_BILLING,
   IS_LOADING,
   REMOVE_BILLING,
+  UPDATE_BILLING,
 } from "./ActionTypes";
 
 const Reducer = (state, action) => {
   switch (action.type) {
     case ADD_BILLING:
-      const max = state.allBill.length;
-
-      console.log(max);
       const check = state.allBill?.filter(
         (info) => info._id === action.payload._id
       );
@@ -45,6 +44,19 @@ const Reducer = (state, action) => {
       return {
         ...state,
         allBill: remove,
+      };
+
+    case UPDATE_BILLING:
+      return {
+        ...state,
+        updateState: action.payload,
+      };
+
+    case FILTER_SEARCH:
+      return {
+        ...state,
+
+        search: action.payload,
       };
 
     default:

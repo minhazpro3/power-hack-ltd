@@ -8,10 +8,12 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Context } from "../../state/Store";
 import { ADD_BILLING } from "../../state/ActionTypes";
+import { FILTER_SEARCH } from "./../../state/ActionTypes";
 
 const BillingsHead = () => {
   const [show, setShow] = useState(false);
   const [state, dispatch] = useContext(Context);
+  console.log(state.search);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -44,10 +46,10 @@ const BillingsHead = () => {
         <Modal.Header closeButton>
           <Modal.Title>Create A New Bill</Modal.Title>
         </Modal.Header>
-        <Modal.Body className="mx-auto">
+        <Modal.Body className="mx-auto my-3">
           <form onSubmit={handleSubmit(onSubmit)}>
             <input
-              className="mt-2"
+              className="  form-control"
               {...register("name")}
               type="text"
               placeholder="  Full Name"
@@ -56,7 +58,7 @@ const BillingsHead = () => {
             />
             <br />
             <input
-              className="mt-2"
+              className="  form-control"
               {...register("email")}
               type="email"
               placeholder="E-mail"
@@ -64,7 +66,7 @@ const BillingsHead = () => {
             />
             <br />
             <input
-              className="mt-2"
+              className="  form-control"
               {...register("phone")}
               type="number"
               placeholder="Phone"
@@ -73,7 +75,7 @@ const BillingsHead = () => {
             />
             <br />
             <input
-              className="mt-2"
+              className="  form-control"
               {...register("amount")}
               type="number"
               placeholder="Amount"
@@ -81,7 +83,11 @@ const BillingsHead = () => {
               required
             />
             <br />
-            <input className="mt-2" type="submit" value="Create Post" />
+            <input
+              className="mt-2 btn btn-success w-100 "
+              type="submit"
+              value="Create Post"
+            />
           </form>
         </Modal.Body>
       </Modal>
@@ -96,9 +102,12 @@ const BillingsHead = () => {
             type="text"
             className="form-control"
             id="pwd"
-            placeholder="Search"
+            placeholder="Search by name"
             name="search"
-          ></input>
+            onChange={(e) =>
+              dispatch({ type: FILTER_SEARCH, payload: e.target.value })
+            }
+          />
 
           <Navbar.Collapse className="justify-content-end">
             <Button className="text-white btn btn-success" onClick={handleShow}>
