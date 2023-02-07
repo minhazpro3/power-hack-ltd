@@ -20,7 +20,9 @@ const BillingsHead = () => {
   const { register, handleSubmit, reset } = useForm();
   const onSubmit = (data) => {
     axios
-      .post("http://localhost:5000/api/add-billing", { data })
+      .post("https://power-hack-server-cyc5.onrender.com/api/add-billing", {
+        data,
+      })
       .then((res) => {
         if (res.data.data.acknowledged) {
           reset();

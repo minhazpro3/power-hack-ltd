@@ -35,7 +35,7 @@ const Billings = () => {
     setIsloading(true);
     axios
       .get(
-        `http://localhost:5000/api/billing-list?page=${page}&&limit=${limit}`
+        `https://power-hack-server-cyc5.onrender.com/api/billing-list?page=${page}&&limit=${limit}`
       )
       .then((res) => {
         if (res.data.data) {
@@ -52,7 +52,9 @@ const Billings = () => {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:5000/api/delete-billing/${id}`)
+      .delete(
+        `https://power-hack-server-cyc5.onrender.com/api/delete-billing/${id}`
+      )
       .then((res) => {
         if (res.data.data.acknowledged) {
           dispatch({ type: REMOVE_BILLING, payload: id });
@@ -87,9 +89,12 @@ const Billings = () => {
     };
 
     axios
-      .put(`http://localhost:5000/api/update-billing/${updateData?._id}`, {
-        update,
-      })
+      .put(
+        `https://power-hack-server-cyc5.onrender.com/api/update-billing/${updateData?._id}`,
+        {
+          update,
+        }
+      )
       .then((res) => {
         if (res.data.data.acknowledged) {
           handleClose();
