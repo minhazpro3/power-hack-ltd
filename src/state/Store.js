@@ -3,9 +3,11 @@ import Reducer from "./Reducer";
 
 const initialState = {
   allBill: [],
-  isLoading: false,
+  user: {},
   updateState: {},
   search: "",
+  price: 0,
+  isLoading: true,
 };
 
 const Store = ({ children }) => {

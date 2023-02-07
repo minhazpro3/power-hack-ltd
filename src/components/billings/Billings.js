@@ -1,21 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../../state/Store";
 import axios from "axios";
-import {
-  ADD_BILLING,
-  ADD_PAGE,
-  GET_BILLING,
-  REMOVE_BILLING,
-  UPDATE_BILLING,
-} from "../../state/ActionTypes";
+import { GET_BILLING, REMOVE_BILLING } from "../../state/ActionTypes";
 import { useForm } from "react-hook-form";
-import { Modal } from "react-bootstrap";
+import { Modal, Spinner } from "react-bootstrap";
+import { useToast } from "rc-toastr";
+import { ADD_BILLING } from "./../../state/ActionTypes";
 
 const Billings = () => {
+  const { toast } = useToast();
+  const [isLoading, setIsloading] = useState(false);
   const [state, dispatch] = useContext(Context);
-  const [updateId, setUpdateId] = useState(" ");
+  const [updateData, setUpdateData] = useState({});
 
-  const { allBill, isLoading, search } = state;
+  const { allBill, search } = state;
 
   const [page, setPage] = useState(1);
   const [show, setShow] = useState(false);
@@ -23,26 +21,25 @@ const Billings = () => {
   const handleClose = () => {
     setShow(false);
     reset();
+    setUpdateData(" ");
   };
-  const handleShow = () => setShow(true);
+  const handleShow = (bill) => {
+    setShow(true);
+    setUpdateData(bill);
+  };
   const { register, handleSubmit, reset } = useForm();
   const limit = 10;
 
-  const handleBill = (id) => {
-    handleShow();
-
-    setUpdateId(id);
-  };
-
   // query bills
   useEffect(() => {
+    setIsloading(true);
     axios
       .get(
         `http://localhost:5000/api/billing-list?page=${page}&&limit=${limit}`
       )
       .then((res) => {
         if (res.data.data) {
-          console.log(res.data.data);
+          setIsloading(false);
           dispatch({
             type: GET_BILLING,
             payload: res.data.data,
@@ -59,7 +56,7 @@ const Billings = () => {
       .then((res) => {
         if (res.data.data.acknowledged) {
           dispatch({ type: REMOVE_BILLING, payload: id });
-          alert("Delete success");
+          toast.success("Deleted successfully");
         }
       });
   };
@@ -82,7 +79,7 @@ const Billings = () => {
 
   const onSubmit = (data) => {
     const update = {
-      _id: updateId?._id,
+      _id: updateData?._id,
       name: data.name,
       email: data.email,
       phone: data.phone,
@@ -90,17 +87,25 @@ const Billings = () => {
     };
 
     axios
-      .put(`http://localhost:5000/api/update-billing/${updateId?._id}`, {
+      .put(`http://localhost:5000/api/update-billing/${updateData?._id}`, {
         update,
       })
       .then((res) => {
-        console.log(res.data);
-        // if (res.data) {
-        //   handleClose();
-        //   alert("updated success!");
+        if (res.data.data.acknowledged) {
+          handleClose();
+          toast.success("updated success!");
 
-        //   dispatch({ type: ADD_BILLING, payload: update });
-        // }
+          dispatch({
+            type: ADD_BILLING,
+            payload: {
+              name: data.name,
+              email: data.email,
+              phone: data.email,
+              amount: data.amount,
+              _id: updateData?._id,
+            },
+          });
+        }
       });
   };
 
@@ -116,16 +121,16 @@ const Billings = () => {
               className="mt-2"
               {...register("name")}
               type="text"
-              placeholder={"Full Name"}
-              required
+              placeholder={updateData?.name}
               maxLength="15"
+              required
             />
             <br />
             <input
               className="mt-2"
               {...register("email")}
               type="email"
-              placeholder="E-mail"
+              placeholder={updateData?.email}
               required
             />
             <br />
@@ -133,88 +138,95 @@ const Billings = () => {
               className="mt-2"
               {...register("phone")}
               type="number"
-              placeholder="Phone"
-              required
+              placeholder={updateData?.phone}
               maxLength="15"
+              required
             />
             <br />
             <input
               className="mt-2"
               {...register("amount")}
               type="number"
-              placeholder="Amount"
+              placeholder={updateData?.amount}
               maxLength="8"
               required
             />
             <br />
-            <input className="mt-2" type="submit" value="Create Post" />
+            <input className="mt-2" type="submit" value="Update Post" />
           </form>
         </Modal.Body>
       </Modal>
-      <div class="container">
+      <div className="container">
         <h2>Bordered Table</h2>
         <p>The .table-bordered class adds borders to a table:</p>
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>Booking Id</th>
-              <th>Full Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Paid Amount</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {allBill.length &&
-              allBill
-                ?.filter((item) => {
-                  return search.toLowerCase() === ""
-                    ? item
-                    : item.name?.toLowerCase().includes(search) ||
-                        item.phone?.includes(search) ||
-                        item.email.toLowerCase().includes(search) ||
-                        item.amount.includes(search);
-                })
-                .map((bill, index) => (
-                  <tr key={index}>
-                    <td>{isLoading ? <sma>lod..</sma> : bill?._id}</td>
-                    <td>{bill?.name}</td>
-                    <td>{bill?.email}</td>
-                    <td>{bill?.phone}</td>
-                    <td>${bill?.amount}</td>
-                    <td>
-                      <button
-                        onClick={() => handleBill(bill?._id)}
-                        className="btn btn-primary"
-                      >
-                        Edit
-                      </button>{" "}
-                      |{" "}
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => handleDelete(bill?._id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-          </tbody>
-        </table>
+        {isLoading ? (
+          <div className="d-flex align-items-center justify-content-center  my-5">
+            {" "}
+            <Spinner animation="grow " variant="secondary" />
+          </div>
+        ) : (
+          <table className="table table-bordered">
+            <thead>
+              <tr>
+                <th>Booking Id</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Paid Amount</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {allBill.length &&
+                allBill
+                  ?.filter((item) => {
+                    return search.toLowerCase() === ""
+                      ? item
+                      : item.name?.toLowerCase().includes(search) ||
+                          item.phone?.includes(search) ||
+                          item.email.toLowerCase().includes(search) ||
+                          item.amount.includes(search);
+                  })
+                  .map((bill, index) => (
+                    <tr key={index}>
+                      <td> {bill?._id}</td>
+                      <td>{bill?.name}</td>
+                      <td>{bill?.email}</td>
+                      <td>{bill?.phone}</td>
+                      <td>${bill?.amount}</td>
+                      <td>
+                        <button
+                          onClick={() => handleShow(bill)}
+                          className="btn btn-primary"
+                        >
+                          Edit
+                        </button>{" "}
+                        |{" "}
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => handleDelete(bill?._id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+            </tbody>
+          </table>
+        )}
       </div>
-      <div className=" d-flex justify-content-center gap-2 text-center">
-        <button className="btn btn-success" onClick={handlePrevious}>
-          Previous
-        </button>
-        {allBill.length - 1 ? (
+      {!isLoading && (
+        <div className=" d-flex justify-content-center gap-2 text-center">
+          <button className="btn btn-success" onClick={handlePrevious}>
+            Previous
+          </button>
+
           <button className="btn btn-success" onClick={handleNext}>
             Next
           </button>
-        ) : (
-          ""
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

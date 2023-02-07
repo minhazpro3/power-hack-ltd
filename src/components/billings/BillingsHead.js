@@ -9,12 +9,12 @@ import axios from "axios";
 import { Context } from "../../state/Store";
 import { ADD_BILLING } from "../../state/ActionTypes";
 import { FILTER_SEARCH } from "./../../state/ActionTypes";
+import { useToast } from "rc-toastr";
 
 const BillingsHead = () => {
   const [show, setShow] = useState(false);
   const [state, dispatch] = useContext(Context);
-  console.log(state.search);
-
+  const { toast } = useToast();
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const { register, handleSubmit, reset } = useForm();
@@ -26,6 +26,8 @@ const BillingsHead = () => {
           reset();
           handleClose();
 
+          toast.success("Wow! Successfully Done");
+
           dispatch({
             type: ADD_BILLING,
             payload: {
@@ -36,6 +38,8 @@ const BillingsHead = () => {
               _id: res.data.data.insertedIds[0],
             },
           });
+        } else {
+          toast.error("Something went wrong!");
         }
       });
   };

@@ -1,9 +1,10 @@
 import {
   ADD_BILLING,
-  ADD_PAGE,
+  ADD_USER,
   FILTER_SEARCH,
   GET_BILLING,
-  IS_LOADING,
+  IS_LOADING_FALSE,
+  IS_LOADING_TRUE,
   REMOVE_BILLING,
   UPDATE_BILLING,
 } from "./ActionTypes";
@@ -32,7 +33,7 @@ const Reducer = (state, action) => {
     case GET_BILLING:
       return {
         ...state,
-        isLoading: false,
+
         allBill: action.payload,
       };
 
@@ -46,6 +47,11 @@ const Reducer = (state, action) => {
         allBill: remove,
       };
 
+    case ADD_USER:
+      return {
+        ...state,
+        user: { ...action.payload },
+      };
     case UPDATE_BILLING:
       return {
         ...state,
@@ -57,6 +63,18 @@ const Reducer = (state, action) => {
         ...state,
 
         search: action.payload,
+      };
+
+    case IS_LOADING_TRUE:
+      return {
+        ...state,
+        isLoading: true,
+      };
+
+    case IS_LOADING_FALSE:
+      return {
+        ...state,
+        isLoading: { ...action.payload },
       };
 
     default:
